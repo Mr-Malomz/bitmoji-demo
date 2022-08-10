@@ -1,46 +1,29 @@
-import axios from 'axios'
-import { useState, useEffect } from 'react'
-
-const baseURL = 'https://public-api.mirror-ai.net/v2/generate'
+import Image from 'next/image';
+import { useState } from 'react';
 
 const ImageUploadForm = () => {
   // upload image to API
-  const [image, setImage] = useState(null)
+  const [image, setImage] = useState(null);
+  const [imgResult, setImgResult] = useState(null);
 
   const handleImageUpload = (e) => {
     // get file from event
-    setImage(e.target.files[0])
-  }
+    setImage(e.target.files[0]);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    console.log(setImage)
-    const formData = new FormData()
-    formData.append('image', setImage)
-
-    // send image to API
+    const formData = new FormData();
+    formData.append('file', image);
     fetch('/api/mirror', {
       method: 'POST',
-
       body: formData,
     })
-      .then((res) => console.log(res.json()))
-      .catch((err) => console.log(err))
-  }
-
-  // const submitImage = async () => {
-  //   const result = await fetch('https://public-api.mirror-ai.net/v2/generate', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: myData,
-  //   })
-
-  //   const resultInJson = await result.json()
-  //   setAuthors((prev) => [...prev, resultInJson])
-  // }
+      .then((res) => res.json())
+      .then((res) => setImgResult(res.msg.face.url))
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div>
@@ -52,13 +35,17 @@ const ImageUploadForm = () => {
           <input
             className='form-control form-control-lg'
             type='file'
+            required
             onChange={handleImageUpload}
           />
           <button type='submit'>Submit</button>
         </div>
       </form>
+      {imgResult && (
+        <img alt='bitmoji' width={500} height='500' src={imgResult} />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default ImageUploadForm
+export default ImageUploadForm;
